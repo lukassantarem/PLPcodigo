@@ -1,0 +1,36 @@
+import wx
+
+class SistemaDoacaoSangue(wx.Frame):
+    def __init__(self, parent, title):
+        super(SistemaDoacaoSangue, self).__init__(parent, title=title, size=(400, 300))
+        painel = wx.Panel(self)
+        
+
+        wx.StaticText(painel, label="Consulta:", pos=(10, 10))
+        self.escolha = wx.Choice(painel, choices=[
+            "Quem está apto a doar sangue para alguém?",
+            "Para quem Fulano pode doar ou receber sangue?",
+            "Quem possui determinado tipo sanguíneo?",
+            "Quem é doador de fator RH+ ou RH-?"
+        ], pos=(10, 30))
+        
+        
+        self.botao = wx.Button(painel, label="Executar", pos=(10, 70))
+        self.botao.Bind(wx.EVT_BUTTON, self.executar_consulta)
+        
+        
+     self.resultado = wx.TextCtrl(painel, pos=(10, 110), size=(360, 140), style=wx.TE_MULTILINE  | wx.TE_READONLY)
+        
+        self.Centre()
+        self.Show()
+    
+    def executar_consulta(self, event):
+        
+        consulta = self.escolha.GetString(self.escolha.GetSelection())
+        resultado = f"Resultado da consulta: {consulta}"  # Substituir pela resposta do sistema Prolog
+        self.resultado.SetValue(resultado)
+
+app = wx.App(False)
+SistemaDoacaoSangue(None, title="Sistema Especialista de Doação de Sangue")
+app.MainLoop()
+
