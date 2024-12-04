@@ -19,16 +19,22 @@ class SistemaDoacaoSangue(wx.Frame):
         self.botao.Bind(wx.EVT_BUTTON, self.executar_consulta)
         
         
-     self.resultado = wx.TextCtrl(painel, pos=(10, 110), size=(360, 140), style=wx.TE_MULTILINE  | wx.TE_READONLY)
+    self.resultado = wx.TextCtrl(painel, pos=(10, 110), size=(360, 140), style=wx.TE_MULTILINE  | wx.TE_READONLY)
         
-        self.Centre()
-        self.Show()
+    self.Centre()
+    self.Show()
     
     def executar_consulta(self, event):
+    
+    selecao = self.escolha.GetSelection()
+    if selecao == wx.NOT_FOUND:
+        wx.MessageBox("Por favor, selecione uma consulta.", "Erro", wx.OK | wx.ICON_ERROR)
+        return
+
         
-        consulta = self.escolha.GetString(self.escolha.GetSelection())
-        resultado = f"Resultado da consulta: {consulta}"  # Substituir pela resposta do sistema Prolog
-        self.resultado.SetValue(resultado)
+consulta = self.escolha.GetString(selecao)
+resultado = f"Resultado da consulta: {consulta}"  
+self.resultado.SetValue(resultado)
 
 app = wx.App(False)
 SistemaDoacaoSangue(None, title="Sistema Especialista de Doação de Sangue")
