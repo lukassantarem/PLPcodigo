@@ -1,10 +1,29 @@
 import wx
 
+# Dados do sistema especialista
+tipos_sanguineos = {
+    "a+": ["a+", "ab+"],
+    "a-": ["a+", "a-", "ab+", "ab-"],
+    "b+": ["b+", "ab+"],
+    "b-": ["b+", "b-", "ab+", "ab-"],
+    "ab+": ["ab+"],
+    "ab-": ["ab+", "ab-"],
+    "o+": ["o+", "a+", "b+", "ab+"],
+    "o-": ["o+", "o-", "a+", "a-", "b+", "b-", "ab+", "ab-"]
+}
+
+pessoas = {
+    "joao": "a+",
+    "maria": "b+",
+    "ana": "o-",
+    "pedro": "ab-",
+    "julia": "a-",
+}
+
 class SistemaDoacaoSangue(wx.Frame):
-    def __init__(self, parent, title):
-        super(SistemaDoacaoSangue, self).__init__(parent, title=title, size=(400, 300))
+    def _init_(self, parent, title):
+        super(SistemaDoacaoSangue, self)._init_(parent, title=title, size=(500, 400))
         painel = wx.Panel(self)
-        
 
         wx.StaticText(painel, label="Consulta:", pos=(10, 10))
         self.escolha = wx.Choice(painel, choices=[
@@ -13,30 +32,56 @@ class SistemaDoacaoSangue(wx.Frame):
             "Quem possui determinado tipo sanguíneo?",
             "Quem é doador de fator RH+ ou RH-?"
         ], pos=(10, 30))
-        
-        
-        self.botao = wx.Button(painel, label="Executar", pos=(10, 70))
+
+        self.input_dado = wx.TextCtrl(painel, pos=(10, 70), size=(200, 25))
+        wx.StaticText(painel, label="Digite um nome ou tipo sanguíneo:", pos=(220, 70))
+
+        self.botao = wx.Button(painel, label="Executar", pos=(10, 110))
         self.botao.Bind(wx.EVT_BUTTON, self.executar_consulta)
-        
-        
-    self.resultado = wx.TextCtrl(painel, pos=(10, 110), size=(360, 140), style=wx.TE_MULTILINE  | wx.TE_READONLY)
-        
-    self.Centre()
-    self.Show()
-    
+
+        self.resultado = wx.TextCtrl(painel, pos=(10, 150), size=(460, 200),
+                                     style=wx.TE_MULTILINE | wx.TE_READONLY)
+
+        self.Centre()
+        self.Show()
+
     def executar_consulta(self, event):
-    
-    selecao = self.escolha.GetSelection()
-    if selecao == wx.NOT_FOUND:
-        wx.MessageBox("Por favor, selecione uma consulta.", "Erro", wx.OK | wx.ICON_ERROR)
-        return
+        consulta = self.escolha.GetString(self.escolha.GetSelection())
+        entrada = self.input_dado.GetValue().lower().strip()
 
-        
-consulta = self.escolha.GetString(selecao)
-resultado = f"Resultado da consulta: {consulta}"  
-self.resultado.SetValue(resultado)
+        if consulta == "Quem está apto a doar sangue para alguém?":
+            if entrada in pessoas:
+                tipo = pessoas[entrada]
+                aptos = [nome for nome, t in pessoas.items() if tipo in tipos_sanguineos[t]]
+                self.resultado.SetValue(f"Pode receber de: {', '.join(aptos)}")
+            else:
+                self.resultado.SetValue("Pessoa não encontrada.")
 
-app = wx.App(False)
-SistemaDoacaoSangue(None, title="Sistema Especialista de Doação de Sangue")
-app.MainLoop()
+        elif consulta == "Para quem Fulano pode doar ou receber sangue?":
+            if entrada in pessoas:
+                tipo = pessoas[entrada]
+                receptores = [nome for nome, t in pessoas.items() if t in tipos_sanguineos[tipo]]
+                self.resultado.SetValue(f"Pode doar para: {', '.join(receptores)}")
+            else:
+                self.resultado.SetValue("Pessoa não encontrada.")
 
+        elif consulta == "Quem possui determinado tipo sanguíneo?":
+            aptos = [nome for nome, t in pessoas.items() if t == entrada]
+            if aptos:
+                self.resultado.SetValue(f"Pessoas com tipo {entrada.upper()}: {', '.join(aptos)}")
+            else:
+                self.resultado.SetValue("Nenhuma pessoa encontrada com esse tipo sanguíneo.")
+
+        elif consulta == "Quem é doador de fator RH+ ou RH-?":
+            if entrada in ["rh+", "rh-"]:
+                fator = "+" if entrada == "rh+" else "-"
+                aptos = [nome for nome, t in pessoas.items() if t.endswith(fator)]
+                self.resultado.SetValue(f"Doador(es) com fator {entrada.upper()}: {', '.join(aptos)}")
+            else:
+                self.resultado.SetValue("Digite 'RH+' ou 'RH-' para realizar a consulta.")
+
+
+if _name_ == "_main_":
+    app = wx.App(False)
+    frame = SistemaDoacaoSangue(None, "Sistema de Doação de Sangue")
+    app.MainLoop()
