@@ -21,7 +21,7 @@ Sua estrutura contém:
 
 Para executar o programa, são necessários os seguintes componentes:
 
-**SWI-Prolog**:
+**SWI-Prolog:**
 - Baixe e instale a versão mais recente do SWI-Prolog.
 --se de que o Prolog está no PATH do sistema.
 
